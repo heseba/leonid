@@ -20,7 +20,8 @@ import cv2
 EPOCHS = 40
 RESIZE_X = 900
 RESIZE_Y = 600
-TARGET_METRIC = 'Aesthetics'
+TARGET_METRIC = 'Aesthetics' #Complexity,Aesthetics,Orderliness
+TENSORBOARD_OUTPUT = 'tensorboard'
 
 
 def value_of_metric(screenshot_name, all_metrics):
@@ -115,7 +116,7 @@ if __name__ == '__main__':
     print(f'\n\nTraining Model for {TARGET_METRIC}\n\n')
 
     history = model.fit(X_train, y_train, validation_split=0.20, epochs=EPOCHS,
-                        callbacks=[keras.callbacks.TensorBoard('history11'),
+                        callbacks=[keras.callbacks.TensorBoard(TENSORBOARD_OUTPUT),
                                    keras.callbacks.EarlyStopping(monitor='val_loss',
                                                                  min_delta=0,
                                                                  patience=6,
