@@ -1,6 +1,8 @@
 # https://colab.research.google.com/drive/1FOxO55_MmyJDoorQ329xabaxKZ03Rv0z?usp=sharing
 
 import os
+from pathlib import Path
+
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow
@@ -21,22 +23,24 @@ def get_class(name):
 
 
 def load_data(data_dir):
-    directories = [d for d in os.listdir(data_dir)
-                   if os.path.isdir(os.path.join(data_dir, d))]
+    data_dir = Path(data_dir)
+    directories = [d for d in data_dir.iterdir() if d.is_dir()]
     labels = []
     images = []
     for d in directories:
-        label_dir = os.path.join(data_dir, d)
-        file_names = [os.path.join(label_dir, f)
-                      for f in os.listdir(label_dir)
-                      if f.endswith(".png")]
+        screenshots = d.glob('*.png')
+
         index = 0
-        for f in file_names:
-            img = cv2.imread(f)
+        for screenshot in screenshots:
+            img = cv2.imread(str(screenshot.resolve()))
             try:
+                print('1')
                 imresize = cv2.resize(img, (900, 600))
-                name_temp = get_class(f.replace("images2\screens\\", ""))
+                print('2')
+                name_temp = get_class(screenshot.name)
+                print('3')
                 if name_temp.size != 0:
+                    print('4')
                     images.append(imresize)
                     index += 1
                     labels.append(name_temp)
