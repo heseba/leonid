@@ -39,35 +39,33 @@ class CNN:
         print(metric_value)
         return metric_value
 
+    @staticmethod
+    def filename_to_path(fn, available_screenshots):
+        for (name, path) in available_screenshots:
+            if name == fn:
+                return str(path.resolve())
+
+    def process_path(self, row):
+        metric = row[self.target_metric]
+        return tf.io.read_file(row['filepath']), metric
+
     def load_data(self, data_dir):
         if self.all_metrics is None:
             self.all_metrics = pd.read_csv("integer.csv", delimiter=',')
 
-        images = []
-        metric_values = []
+        screenshots_of_domain = self.all_metrics[self.all_metrics.domain.isin(self.domains)]
+        available_screenshots = [(p.name, p) for p in Path(data_dir).glob('*/*.png')]
 
-        screenshots = Path(data_dir).glob('*/*.png')
+        samples = screenshots_of_domain[
+            screenshots_of_domain.filename.isin([name for name, _ in available_screenshots])]
+        samples = samples[['filename', self.target_metric]]
+        samples['filepath'] = samples.filename.map(lambda fn: CNN.filename_to_path(fn, available_screenshots))
 
-        for screenshot in screenshots:
-            if screenshot.name not in self.all_metrics.filename.values:
-                print(f'NOT IN METRICS {screenshot.name}')
-                continue
-            if self.all_metrics.loc[self.all_metrics['filename'] == screenshot.name].domain.values[0] not in self.domains:
-                continue
+        sample_slices = tf.data.Dataset.from_tensor_slices(dict(samples))
 
-            img = cv2.imread(str(screenshot.resolve()))
-            try:
-                imresize = cv2.resize(img, (self.resize_x, self.resize_y))
-                metric_value = self.value_of_metric(screenshot.name, self.all_metrics)
-                if metric_value.size != 0:
-                    images.append(imresize)
-                    metric_values.append(metric_value)
+        dataset = sample_slices.map(self.process_path)
 
-            except Exception as e:
-                print('EXCEPTION ' + str(e))
-                print(screenshot.name)
-
-        return images, metric_values
+        return dataset
 
     @staticmethod
     def coeff_determination(y_true, y_pred):
@@ -117,18 +115,18 @@ class CNN:
         config.gpu_options.allow_growth = True
         session = tf.compat.v1.Session(config=config)
 
-        X_train, y_train = self.load_data("images2")
-        X_train = np.array(X_train).astype('float32')
-        X_train = X_train / 255.0
+        dataset = self.load_data("images2")
 
-        print(y_train)
-        y_train = np.array(y_train)
-        print(y_train)
+# TODO integrate in dataset creation in load_data()
+#        X_train = np.array(X_train).astype('float32')
+#        X_train = X_train / 255.0
+
+
         model = self.create_model()
 
         print(f'\n\nTraining Model for {self.target_metric}\n\n')
 
-        history = model.fit(X_train, y_train, validation_split=0.20, epochs=self.epochs,
+        history = model.fit(dataset, validation_split=0.20, epochs=self.epochs,
                             callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
                                        keras.callbacks.EarlyStopping(monitor='val_loss',
                                                                      min_delta=0,
@@ -138,5 +136,5 @@ class CNN:
 
 
 if __name__ == '__main__':
-    cnn = CNN('Aesthetics')
+    cnn = CNN('Aesthetics', domains=['food'])
     cnn.train()
