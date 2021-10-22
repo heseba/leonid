@@ -61,11 +61,17 @@ class CNN:
         samples = samples[['filename', self.target_metric]]
         samples['filepath'] = samples.filename.map(lambda fn: CNN.filename_to_path(fn, available_screenshots))
 
-        sample_slices = tf.data.Dataset.from_tensor_slices(dict(samples))
 
-        dataset = sample_slices.map(self.process_path)
+        #cf. https://stackoverflow.com/questions/56111120/valueerror-if-your-data-is-in-the-form-of-a-python-generator-you-cannot-use
+        # https: // www.tensorflow.org / api_docs / python / tf / keras / preprocessing / image / ImageDataGenerator
+        image_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255, validation_split=0.20)
+        image_data_train = image_generator.flow_from_dataframe(samples, x_col='filepath', y_col=self.target_metric,
+            target_size=(self.resize_x, self.resize_y), subset='training')
+        image_data_val = image_generator.flow_from_dataframe(samples, x_col='filepath', y_col=self.target_metric,
+            target_size=(self.resize_x, self.resize_y), subset='validation')
 
-        return dataset
+
+        return image_data_train, image_data_val
 
     @staticmethod
     def coeff_determination(y_true, y_pred):
@@ -115,18 +121,14 @@ class CNN:
         config.gpu_options.allow_growth = True
         session = tf.compat.v1.Session(config=config)
 
-        dataset = self.load_data("images2")
-
-# TODO integrate in dataset creation in load_data()
-#        X_train = np.array(X_train).astype('float32')
-#        X_train = X_train / 255.0
+        image_data_train, image_data_val = self.load_data("images2")
 
 
         model = self.create_model()
 
         print(f'\n\nTraining Model for {self.target_metric}\n\n')
 
-        history = model.fit(dataset, validation_split=0.20, epochs=self.epochs,
+        history = model.fit(image_data_train, validation_data=image_data_val, epochs=self.epochs,
                             callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
                                        keras.callbacks.EarlyStopping(monitor='val_loss',
                                                                      min_delta=0,
