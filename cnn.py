@@ -8,12 +8,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow
 import tensorflow as tf
 import pandas as pd
-import numpy as np
 from tensorflow import keras
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D, Input, Dense, Dropout, Conv2D, MaxPooling2D
-import cv2
 
 
 class CNN:
@@ -61,32 +59,21 @@ class CNN:
         samples = samples[['filename', self.target_metric]]
         samples['filepath'] = samples.filename.map(lambda fn: CNN.filename_to_path(fn, available_screenshots))
 
+        samples = samples.sample(frac=1.0)  # shuffling
 
-        validation_samples = samples.sample(frac=0.20)
-        train_samples = samples[~samples.index.isin(validation_samples.index)]
-        print(f'Total Samples: {len(samples)}')
-        print(f'Training Samples:  {len(train_samples)}')
-        print(f'Validation Samples:  {len(validation_samples)}')
+        image_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255, validation_split=0.20)
 
-        #cf. https://stackoverflow.com/questions/56111120/valueerror-if-your-data-is-in-the-form-of-a-python-generator-you-cannot-use
-        # https: // www.tensorflow.org / api_docs / python / tf / keras / preprocessing / image / ImageDataGenerator
-        train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255)
-        validation_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255)
-
-        image_data_train = train_data_generator.flow_from_dataframe(train_samples,
-                                                               directory=data_dir,
-                                                               x_col='filename',
+        image_data_train = image_generator.flow_from_dataframe(samples,
+                                                               x_col='filepath',
                                                                y_col=self.target_metric,
-                                                               target_size=(self.resize_x, self.resize_y),
-                                                               class_mode='other')
+                                                               subset='training',
+                                                               class_mode='raw')
 
-        image_data_val = validation_data_generator.flow_from_dataframe(validation_samples,
-                                                             directory=data_dir,
-                                                             x_col='filename',
+        image_data_val = image_generator.flow_from_dataframe(samples,
+                                                             x_col='filepath',
                                                              y_col=self.target_metric,
-                                                             target_size=(self.resize_x, self.resize_y),
-                                                             class_mode='other')
-
+                                                             subset='validation',
+                                                             class_mode='raw')
 
         return image_data_train, image_data_val
 
@@ -133,19 +120,23 @@ class CNN:
         model.compile(loss='mse', optimizer='adam', metrics=['mae', 'mse', self.coeff_determination])
         return model
 
-    def train(self):
+    def train(self, images_dir):
         config = tf.compat.v1.ConfigProto()
         config.gpu_options.allow_growth = True
         session = tf.compat.v1.Session(config=config)
 
-        image_data_train, image_data_val = self.load_data("images2")
-
+        image_data_train, image_data_val = self.load_data(images_dir)
 
         model = self.create_model()
 
         print(f'\n\nTraining Model for {self.target_metric}\n\n')
 
-        history = model.fit(image_data_train, validation_data=image_data_val, epochs=self.epochs,
+        history = model.fit(image_data_train,
+                            validation_data=image_data_val,
+                            epochs=self.epochs,
+                            verbose=1,
+                            # steps_per_epoch=TotalTrainingSamples / TrainingBatchSize,
+                            # validation_steps = TotalvalidationSamples / ValidationBatchSize,
                             callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
                                        keras.callbacks.EarlyStopping(monitor='val_loss',
                                                                      min_delta=0,
@@ -156,4 +147,4 @@ class CNN:
 
 if __name__ == '__main__':
     cnn = CNN('Aesthetics', domains=['food'])
-    cnn.train()
+    cnn.train('images-food-debug')
