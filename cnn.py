@@ -62,13 +62,30 @@ class CNN:
         samples['filepath'] = samples.filename.map(lambda fn: CNN.filename_to_path(fn, available_screenshots))
 
 
+        validation_samples = samples.sample(frac=0.20)
+        train_samples = samples[~samples.index.isin(validation_samples.index)]
+        print(f'Total Samples: {len(samples)}')
+        print(f'Training Samples:  {len(train_samples)}')
+        print(f'Validation Samples:  {len(validation_samples)}')
+
         #cf. https://stackoverflow.com/questions/56111120/valueerror-if-your-data-is-in-the-form-of-a-python-generator-you-cannot-use
         # https: // www.tensorflow.org / api_docs / python / tf / keras / preprocessing / image / ImageDataGenerator
-        image_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255, validation_split=0.20)
-        image_data_train = image_generator.flow_from_dataframe(samples, x_col='filepath', y_col=self.target_metric,
-            target_size=(self.resize_x, self.resize_y), subset='training')
-        image_data_val = image_generator.flow_from_dataframe(samples, x_col='filepath', y_col=self.target_metric,
-            target_size=(self.resize_x, self.resize_y), subset='validation')
+        train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255)
+        validation_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1 / 255)
+
+        image_data_train = train_data_generator.flow_from_dataframe(train_samples,
+                                                               directory=data_dir,
+                                                               x_col='filename',
+                                                               y_col=self.target_metric,
+                                                               target_size=(self.resize_x, self.resize_y),
+                                                               class_mode='other')
+
+        image_data_val = validation_data_generator.flow_from_dataframe(validation_samples,
+                                                             directory=data_dir,
+                                                             x_col='filename',
+                                                             y_col=self.target_metric,
+                                                             target_size=(self.resize_x, self.resize_y),
+                                                             class_mode='other')
 
 
         return image_data_train, image_data_val
