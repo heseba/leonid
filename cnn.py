@@ -1,6 +1,7 @@
 # https://colab.research.google.com/drive/1FOxO55_MmyJDoorQ329xabaxKZ03Rv0z?usp=sharing
 
 import os
+import time
 from pathlib import Path
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -117,7 +118,8 @@ class CNN:
 
         model = Model(input_layer, X)
 
-        model.compile(loss='mse', optimizer='adam', metrics=['mae', 'mse', self.coeff_determination])
+        model.compile(loss='mse', optimizer='adam',
+                      metrics=['mae', 'mse', self.coeff_determination, tf.keras.metrics.RootMeanSquaredError()])
         return model
 
     def train(self, images_dir):
@@ -129,22 +131,40 @@ class CNN:
 
         model = self.create_model()
 
+        time_callback = TimeHistory()
+
         print(f'\n\nTraining Model for {self.target_metric}\n\n')
 
-        history = model.fit(image_data_train,
-                            validation_data=image_data_val,
-                            epochs=self.epochs,
-                            verbose=1,
-                            # steps_per_epoch=TotalTrainingSamples / TrainingBatchSize,
-                            # validation_steps = TotalvalidationSamples / ValidationBatchSize,
-                            callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
-                                       keras.callbacks.EarlyStopping(monitor='val_loss',
-                                                                     min_delta=0,
-                                                                     patience=6,
-                                                                     verbose=0, mode='auto')])
+        model.fit(image_data_train,
+                  validation_data=image_data_val,
+                  epochs=self.epochs,
+                  # verbose=1,
+                  verbose=0,
+                  # steps_per_epoch=TotalTrainingSamples / TrainingBatchSize,
+                  # validation_steps = TotalvalidationSamples / ValidationBatchSize,
+                  callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
+                             time_callback,
+                             keras.callbacks.EarlyStopping(monitor='val_loss',
+                                                           min_delta=0,
+                                                           patience=6,
+                                                           verbose=0, mode='auto')])
         print(f'\n\nTraining Done')
+        return model, model.history, image_data_train.n, image_data_val.n, time_callback.times
+
+
+class TimeHistory(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.times = []
+
+    def on_epoch_begin(self, epoch, logs={}):
+        self.epoch_time_start = time.time()
+
+    def on_epoch_end(self, epoch, logs={}):
+        self.times.append(time.time() - self.epoch_time_start)
 
 
 if __name__ == '__main__':
     cnn = CNN('Aesthetics', domains=['food'])
-    cnn.train('images-food-debug')
+    model, history, n_train, n_val, times = cnn.train('images-food-debug')
+    print(history.history)
+
