@@ -1,3 +1,6 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+
 from itertools import combinations
 from pathlib import Path
 
@@ -60,7 +63,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
         mae = history.history['val_mae'][-1]
         rmse = history.history['val_root_mean_squared_error'][-1]
         time = sum(times)
-        epochs = len(history.history)
+        epochs = len(times)
 
         experiments_csv.writerow(
             [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
