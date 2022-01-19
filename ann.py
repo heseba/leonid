@@ -22,7 +22,7 @@ def load_data(path):
     x = data.loc[:, 'VA_PNG':'grid quality']
     print(x)
     x = maximum_absolute_scaling(x)
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
     return x_train, y_train, x_test, y_test
 
 
