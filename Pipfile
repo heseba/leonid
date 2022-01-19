@@ -9,6 +9,8 @@ pandas = "*"
 opencv-python = "*"
 pillow = "*"
 scipy = "*"
+scikit-learn = "*"
+keras-tuner = "*"
 
 [dev-packages]
 

@@ -1,8 +1,9 @@
 # https://colab.research.google.com/drive/1FOxO55_MmyJDoorQ329xabaxKZ03Rv0z?usp=sharing
 
 import os
-import time
 from pathlib import Path
+
+from shared import coeff_determination, TimeHistory
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -10,7 +11,6 @@ import tensorflow
 import tensorflow as tf
 import pandas as pd
 from tensorflow import keras
-from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import GlobalAveragePooling2D, Input, Dense, Dropout, Conv2D, MaxPooling2D
 
@@ -78,12 +78,6 @@ class CNN:
 
         return image_data_train, image_data_val
 
-    @staticmethod
-    def coeff_determination(y_true, y_pred):
-        SS_res = K.sum(K.square(y_true - y_pred))
-        SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
-        return (1 - SS_res / (SS_tot + K.epsilon()))
-
     def create_model(self):
         def inception_block(input_layer, f1, f2_conv1, f2_conv3, f3_conv1, f3_conv5, f4):
             path1 = Conv2D(filters=f1, kernel_size=(1, 1), padding='same', activation='relu')(input_layer)
@@ -119,7 +113,7 @@ class CNN:
         model = Model(input_layer, X)
 
         model.compile(loss='mse', optimizer='adam',
-                      metrics=['mae', 'mse', self.coeff_determination, tf.keras.metrics.RootMeanSquaredError()])
+                      metrics=['mae', 'mse', coeff_determination, tf.keras.metrics.RootMeanSquaredError()])
         return model
 
     def train(self, images_dir):
@@ -139,7 +133,7 @@ class CNN:
                   validation_data=image_data_val,
                   epochs=self.epochs,
                   verbose=1,
-                  #verbose=0,
+                  # verbose=0,
                   # steps_per_epoch=TotalTrainingSamples / TrainingBatchSize,
                   # validation_steps = TotalvalidationSamples / ValidationBatchSize,
                   callbacks=[keras.callbacks.TensorBoard(self.tensorboard_directory),
@@ -152,19 +146,7 @@ class CNN:
         return model, model.history, image_data_train.n, image_data_val.n, time_callback.times
 
 
-class TimeHistory(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.times = []
-
-    def on_epoch_begin(self, epoch, logs={}):
-        self.epoch_time_start = time.time()
-
-    def on_epoch_end(self, epoch, logs={}):
-        self.times.append(time.time() - self.epoch_time_start)
-
-
 if __name__ == '__main__':
     cnn = CNN('Aesthetics', domains=['food'])
     model, history, n_train, n_val, times = cnn.train('images-food-debug')
     print(history.history)
-
