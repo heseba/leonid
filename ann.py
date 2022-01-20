@@ -92,7 +92,7 @@ class ANN:
 
         best_trial = tuner.oracle.trials[tuner.oracle.get_best_trials()[0].trial_id]
 
-        return model, best_trial, len(x_train), len(x_test), tuner.times
+        return model, best_trial, len(x_train), len(x_test), tuner.times, tuner.epochs
 
         # for i in range(1,100):
         #     res = model.predict(np.expand_dims(x_test.iloc[[i]], axis=0))

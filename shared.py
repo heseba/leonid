@@ -34,6 +34,7 @@ class RandomSearchWithTimer(RandomSearch):
             **kwargs
     ):
         self.times = []
+        self.epochs = []
         super().__init__(
             hypermodel=hypermodel,
             objective=objective,
@@ -51,4 +52,5 @@ class RandomSearchWithTimer(RandomSearch):
         trial_end = time.time()
         trial_time = trial_end - trial_start
         self.times.append(trial_time)
+        self.epochs.append(len(histories[0].epoch))
         return histories

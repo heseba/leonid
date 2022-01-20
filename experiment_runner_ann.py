@@ -22,13 +22,13 @@ screenshots_directory = 'images2'
 
 def train(target_metric, domains, all_metrics, screenshots_directory=None):
     ann = ANN(target_metric, domains=domains)
-    model, best_trial, n_train, n_val, times = ann.train()
-    return domains, target_metric, model, best_trial, n_train, n_val, times
+    model, best_trial, n_train, n_val, times, epochs = ann.train()
+    return domains, target_metric, model, best_trial, n_train, n_val, times, epochs
 
 
-def record(experiment, target_metric, model, best_trial, n_train, n_val, times):
+def record(experiment, target_metric, model, best_trial, n_train, n_val, times, epochs):
     csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'target_metric', 'R2', 'mse', 'mae', 'rmse',
-                  'n_train', 'n_val', 'time', 'trials']
+                  'n_train', 'n_val', 'time', 'epochs', 'trials']
 
     csv_exists = csv_path.exists() and csv_path.is_file()
 
@@ -48,7 +48,7 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times):
         trials = len(times)
 
         experiments_csv.writerow(
-            [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, trials])
+            [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs, trials])
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 
