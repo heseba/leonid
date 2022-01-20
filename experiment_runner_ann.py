@@ -28,7 +28,7 @@ def train(target_metric, domains, all_metrics, screenshots_directory=None):
 
 def record(experiment, target_metric, model, best_trial, n_train, n_val, times):
     csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'target_metric', 'R2', 'mse', 'mae', 'rmse',
-                  'n_train', 'n_val', 'time', 'epochs']
+                  'n_train', 'n_val', 'time', 'trials']
 
     csv_exists = csv_path.exists() and csv_path.is_file()
 
@@ -45,10 +45,10 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times):
         mae = best_trial.metrics.metrics['val_mae']._observations[0].value[0]
         rmse = best_trial.metrics.metrics['val_root_mean_squared_error']._observations[0].value[0]
         time = sum(times)
-        epochs = len(times)
+        trials = len(times)
 
         experiments_csv.writerow(
-            [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
+            [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, trials])
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 

@@ -1,14 +1,11 @@
 # https://colab.research.google.com/drive/1xK4-uFEIbS0czVjTHEAgWG2MYuz_jwrr?usp=sharing
-
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Dense
 from tensorflow import keras
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras import backend as K
-from kerastuner.tuners import RandomSearch, Hyperband, BayesianOptimization
 
-from shared import coeff_determination, TimeHistory
+from shared import coeff_determination, RandomSearchWithTimer
 
 
 class ANN:
@@ -61,7 +58,7 @@ class ANN:
 
         print(x_train, y_train, x_test, y_test)
 
-        tuner = RandomSearch(
+        tuner = RandomSearchWithTimer(
             self.build_model,
             objective='mse',
             max_trials=20,
@@ -71,13 +68,10 @@ class ANN:
 
         tuner.search_space_summary()
 
-        time_callback = TimeHistory()
-
         tuner.search(x_train, y_train,
                      epochs=100,
                      validation_split=0.2,
                      callbacks=[keras.callbacks.TensorBoard('history14_ann'),
-                                #time_callback,
                                 keras.callbacks.EarlyStopping(monitor='val_loss',
                                                               min_delta=0,
                                                               patience=6,
@@ -98,8 +92,7 @@ class ANN:
 
         best_trial = tuner.oracle.trials[tuner.oracle.get_best_trials()[0].trial_id]
 
-        #TODO fix time measurements
-        return model, best_trial, len(x_train), len(x_test), [] #, time_callback.times
+        return model, best_trial, len(x_train), len(x_test), tuner.times
 
         # for i in range(1,100):
         #     res = model.predict(np.expand_dims(x_test.iloc[[i]], axis=0))
@@ -112,4 +105,3 @@ if __name__ == '__main__':
     ann = ANN('Aesthetics', domains=['food'])
     model, best_trial, n_train, n_val, times = ann.train()
     print(best_trial)
-
