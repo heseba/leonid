@@ -1,3 +1,5 @@
 /.idea/
 Pipfile.lock
 tensorboard
+__pycache__/
+
