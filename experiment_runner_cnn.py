@@ -3,6 +3,7 @@ import os
 from experiment_runner import ExperimentRunner
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+os.environ['LD_LIBRARY_PATH'] = '$LD_LIBRARY_PATH:/home/sebastian/miniconda3/envs/tf/lib' #adapt if CUDA reports missing libraries
 
 from itertools import combinations
 from pathlib import Path
@@ -16,11 +17,13 @@ from cnn import CNN
 resize_x = 900
 resize_y = 600
 
-csv_path = Path('experiments_cnn.csv')
+experiments_path = Path('experiments_cnn.csv')
+metrics_path = Path('integer.csv')
+
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
 domains = ['news', 'health', 'gov', 'games', 'food', 'culture']
-screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2/screens'
+screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
 
 
 # Debug Setup
@@ -48,9 +51,9 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
     csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'target_metric', 'R2', 'mse', 'mae', 'rmse',
                   'n_train', 'n_val', 'time', 'epochs']
 
-    csv_exists = csv_path.exists() and csv_path.is_file()
+    csv_exists = experiments_path.exists() and experiments_path.is_file()
 
-    with open(str(csv_path), 'a', newline='') as csvfile:
+    with open(str(experiments_path), 'a', newline='') as csvfile:
         experiments_csv = csv.writer(csvfile, delimiter=',')
 
         if not csv_exists:
@@ -71,6 +74,6 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
 
 if __name__ == '__main__':
     # resize_images(screenshots_directory)
-    all_metrics = pd.read_csv(csv_path, delimiter='')
-    runner = ExperimentRunner(csv_path, train, record, target_metrics, domains, all_metrics=all_metrics)
+    all_metrics = pd.read_csv(metrics_path, delimiter=',')
+    runner = ExperimentRunner(experiments_path, train, record, target_metrics, domains, all_metrics=all_metrics)
     runner.run_experiments(screenshots_directory)

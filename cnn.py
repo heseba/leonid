@@ -6,7 +6,11 @@ from pathlib import Path
 from shared import coeff_determination, TimeHistory
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1" #non GPU version
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ['LD_LIBRARY_PATH'] = '$LD_LIBRARY_PATH:/home/sebastian/miniconda3/envs/tf/lib' #adapt if CUDA reports missing libraries
+
+
 import tensorflow
 import tensorflow as tf
 import pandas as pd
@@ -148,5 +152,5 @@ class CNN:
 
 if __name__ == '__main__':
     cnn = CNN('Aesthetics', domains=['food'])
-    model, history, n_train, n_val, times = cnn.train('images-food-debug')
+    model, history, n_train, n_val, times = cnn.train('/windows/Users/Sebastian/Downloads/leonid/images-food-debug')
     print(history.history)
