@@ -20,7 +20,7 @@ csv_path = Path('experiments_cnn.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
 domains = ['news', 'health', 'gov', 'games', 'food', 'culture']
-screenshots_directory = 'images2'
+screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2/screens'
 
 
 # Debug Setup
