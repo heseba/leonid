@@ -17,28 +17,35 @@ from cnn import CNN
 resize_x = 900
 resize_y = 600
 
-experiments_path = Path('experiments_cnn.csv')
-metrics_path = Path('integer.csv')
+experiments_path = Path('test_experiments_cnn.csv')
+#metrics_path = Path('integer.csv')
+metrics_path = Path('test_export.csv')
 
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-domains = ['news', 'health', 'gov', 'games', 'food', 'culture']
-screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
-
+#domains = ['news', 'health', 'gov', 'games', 'food', 'culture']
+domains = ['DOMAIN']
+#screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
+#screenshots_directory = '/windows/Users/Sebastian/Downloads/dataverse_files'
+#resized_screenshots_directory = '/home/sebastian/Downloads/cnn_data_resized/screens'
+screenshots_directory = '/home/sebastian/Downloads/cnn_data_nstu_resized'
 
 # Debug Setup
 # target_metrics = ['Aesthetics']
 # domains = ['food']
 # screenshots_directory = 'images-food-debug'
 
-def resize_images(data_dir):
+def resize_images(data_dir, output_path=None):
+    if output_path is None:
+        output_path = data_dir
+
     for screenshot in Path(data_dir).glob('*/*.png'):
         screenshot = str(screenshot.resolve())
         # screenshot = screenshot.encode('utf-8', 'surrogateescape').decode('ISO-8859-1')
         print(f'Resizing {screenshot}')
         img = cv2.imread(screenshot)
         imresize = cv2.resize(img, (resize_x, resize_y))
-        cv2.imwrite(screenshot, imresize)
+        cv2.imwrite(str(Path(output_path).resolve() / Path(screenshot).name), imresize)
 
 
 def train(target_metric, domains, all_metrics, screenshots_directory):
@@ -73,7 +80,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 
 if __name__ == '__main__':
-    # resize_images(screenshots_directory)
+    #resize_images(screenshots_directory, output_path=resized_screenshots_directory)
     all_metrics = pd.read_csv(metrics_path, delimiter=',')
     runner = ExperimentRunner(experiments_path, train, record, target_metrics, domains, all_metrics=all_metrics)
     runner.run_experiments(screenshots_directory)
