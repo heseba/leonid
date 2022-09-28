@@ -17,13 +17,14 @@ from cnn import CNN
 resize_x = 900
 resize_y = 600
 
-experiments_path = Path('test_experiments_cnn.csv')
+experiments_path = Path('debug_experiments_cnn.csv')
 #metrics_path = Path('integer.csv')
 #metrics_path = Path('test_export.csv')
-metrics_path = Path('combined.csv')
+metrics_path = Path('debug_combined.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'DOMAIN']
+domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'DOMAIN', 'AM2022Banks']
+domains = ['AM2022Banks']
 #domains = ['DOMAIN']
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/dataverse_files'
@@ -58,7 +59,7 @@ def train(target_metric, domains, all_metrics, screenshots_directory):
 
 
 def record(experiment, target_metric, model, history, n_train, n_val, times):
-    csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'target_metric', 'R2', 'mse', 'mae', 'rmse',
+    csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks', 'target_metric', 'R2', 'mse', 'mae', 'rmse',
                   'n_train', 'n_val', 'time', 'epochs']
 
     csv_exists = experiments_path.exists() and experiments_path.is_file()
@@ -69,7 +70,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
         if not csv_exists:
             experiments_csv.writerow(csv_header)
 
-        news, health, gov, games, food, culture = ExperimentRunner.encode_experiment(experiment)
+        news, health, gov, games, food, culture, am2022banks = ExperimentRunner.encode_experiment(experiment)
         r2 = history.history['val_coeff_determination'][-1]
         mse = history.history['val_mse'][-1]
         mae = history.history['val_mae'][-1]
@@ -78,7 +79,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
         epochs = len(times)
 
         experiments_csv.writerow(
-            [news, health, gov, games, food, culture, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
+            [news, health, gov, games, food, culture, am2022banks, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 

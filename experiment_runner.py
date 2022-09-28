@@ -20,7 +20,8 @@ class ExperimentRunner:
         games = int('games' in experiment)
         food = int('food' in experiment)
         culture = int('culture' in experiment)
-        return news, health, gov, games, food, culture
+        am2022banks = int('AM2022Banks' in experiment)
+        return news, health, gov, games, food, culture, am2022banks
 
 
     def experiment_already_ran(self, experiment, target_metric):
@@ -30,7 +31,7 @@ class ExperimentRunner:
 
         experiments = pd.read_csv(self.csv_path)
 
-        news, health, gov, games, food, culture = self.encode_experiment(experiment)
+        news, health, gov, games, food, culture, am2022banks = self.encode_experiment(experiment)
 
         matching_experiments = experiments.loc[
             (experiments.news == news) &
@@ -39,6 +40,7 @@ class ExperimentRunner:
             (experiments.games == games) &
             (experiments.food == food) &
             (experiments.culture == culture) &
+            (experiments.am2022banks == am2022banks) &
             (experiments.target_metric == target_metric)]
 
         return len(matching_experiments) > 0
