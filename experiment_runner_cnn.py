@@ -19,16 +19,19 @@ resize_y = 600
 
 experiments_path = Path('test_experiments_cnn.csv')
 #metrics_path = Path('integer.csv')
-metrics_path = Path('test_export.csv')
-
+#metrics_path = Path('test_export.csv')
+metrics_path = Path('combined.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-#domains = ['news', 'health', 'gov', 'games', 'food', 'culture']
-domains = ['DOMAIN']
+domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'DOMAIN']
+#domains = ['DOMAIN']
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/dataverse_files'
 #resized_screenshots_directory = '/home/sebastian/Downloads/cnn_data_resized/screens'
-screenshots_directory = '/home/sebastian/Downloads/cnn_data_nstu_resized'
+#screenshots_directory = '/home/sebastian/Downloads/cnn_data_nstu_resized'
+screenshots_directory = '/home/sebastian/Downloads/DATASET_COMBINED'
+
+metrics_header = ['filename','domain','Complexity','Aesthetics','Orderliness','VA_PNG','VA_JPEG','elements','elem. types','visual complex','edge congestion','unique RGB','HSVcolours (avg Hue)','HSVcolours (avg Saturation)','HSVcolours (std Saturation)','HSVcolours (avg Value)','HSVcolours (std Value)','HSVspectrum (HSV)','HSVspectrum (Hue)','HSVspectrum (Saturation)','HSVspectrum (Value)','Hassler-Susstrunk (dist A)','Hassler-Susstrunk (std A)','Hassler-Susstrunk (dist B)','Hassler-Susstrunk (std B)','Hassler-Susstrunk (dist RGYB)','Hassler-Susstrunk (std RGYB)','Hassler-Susstrunk (Colorfulness)','Static clusters','DynamicCC (clusters)','DynamicCC (avg cluster colors)','QuadtreeDec (balance)','QuadtreeDec (symmetry)','QuadtreeDec (equilibrium)','QuadtreeDec (leaves)','whitespace','grid quality','count']
 
 # Debug Setup
 # target_metrics = ['Aesthetics']
@@ -79,8 +82,16 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 
+def combine_metrics(metrics_csvs=[]):
+    dataframes = []
+    for metrics_csv in metrics_csvs:
+        dataframes.append(pd.read_csv(metrics_csv, delimiter=','))
+    combined = pd.concat(dataframes, sort=False)
+    combined.to_csv('combined.csv')
+
 if __name__ == '__main__':
     #resize_images(screenshots_directory, output_path=resized_screenshots_directory)
+    #combine_metrics(['integer.csv', 'test_export.csv'])
     all_metrics = pd.read_csv(metrics_path, delimiter=',')
     runner = ExperimentRunner(experiments_path, train, record, target_metrics, domains, all_metrics=all_metrics)
     runner.run_experiments(screenshots_directory)
