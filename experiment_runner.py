@@ -47,7 +47,7 @@ class ExperimentRunner:
 
     def run_experiments(self, screenshots_directory=None):
         for target_metric in self.target_metrics:
-            for r in range(len(self.domains)):
+            for r in reversed(range(len(self.domains))):
                 for experiment in combinations(self.domains, r=r + 1):
                     if self.experiment_already_ran(experiment, target_metric):
                         continue
