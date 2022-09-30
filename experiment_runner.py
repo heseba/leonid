@@ -12,6 +12,8 @@ class ExperimentRunner:
         self.domains = domains
 
 
+
+
     @staticmethod
     def encode_experiment(experiment):
         news = int('news' in experiment)
@@ -48,10 +50,15 @@ class ExperimentRunner:
         return len(matching_experiments) > 0
 
     def run_experiments(self, screenshots_directory=None):
-        for target_metric in self.target_metrics:
-            for r in reversed(range(len(self.domains))):
-                for experiment in combinations(self.domains, r=r + 1):
-                    if self.experiment_already_ran(experiment, target_metric):
-                        continue
-                    self.record(*self.train(target_metric, domains=experiment, all_metrics=self.all_metrics, screenshots_directory=screenshots_directory))
+        experiments_ordered = []
+        for r in range(len(self.domains)):
+            experiments_ordered += list(combinations(self.domains, r + 1))
+        experiments_ordered.sort(key=lambda experiment: sum(
+            self.target_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
 
+        for experiment in experiments_ordered:
+            for target_metric in self.target_metrics:
+                if self.experiment_already_ran(experiment, target_metric):
+                    continue
+                self.record(*self.train(target_metric, domains=experiment, all_metrics=self.all_metrics,
+                                        screenshots_directory=screenshots_directory))
