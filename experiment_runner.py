@@ -24,7 +24,16 @@ class ExperimentRunner:
         culture = int('culture' in experiment)
         am2022banks = int('AM2022Banks' in experiment)
         am2022ecommerce = int('AM2022Ecommerce' in experiment)
-        return news, health, gov, games, food, culture, am2022banks, am2022ecommerce
+        avi = int('avi' in experiment)
+        chi = int('chi' in experiment)
+        english = int('english' in experiment)
+        foreign = int('foreign' in experiment)
+        grayscale = int('grayscale' in experiment)
+        ijhcs = int('ijhcs' in experiment)
+        practice = int('practice' in experiment)
+        webby = int('webby' in experiment)
+        return news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
+            avi, chi, english, foreign, grayscale, ijhcs, practice, webby
 
 
     def experiment_already_ran(self, experiment, target_metric):
@@ -34,7 +43,8 @@ class ExperimentRunner:
 
         experiments = pd.read_csv(self.csv_path)
 
-        news, health, gov, games, food, culture, am2022banks, am2022ecommerce = self.encode_experiment(experiment)
+        news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
+            avi, chi, english, foreign, grayscale, ijhcs, practice, webby = self.encode_experiment(experiment)
 
         matching_experiments = experiments.loc[
             (experiments.news == news) &
@@ -45,6 +55,14 @@ class ExperimentRunner:
             (experiments.culture == culture) &
             (experiments.am2022banks == am2022banks) &
             (experiments.am2022ecommerce == am2022ecommerce) &
+            (experiments.avi == avi) &
+            (experiments.chi == chi) &
+            (experiments.english == english) &
+            (experiments.foreign == foreign) &
+            (experiments.grayscale == grayscale) &
+            (experiments.ijhcs == ijhcs) &
+            (experiments.practice == practice) &
+            (experiments.webby == webby) &
             (experiments.target_metric == target_metric)]
 
         return len(matching_experiments) > 0
