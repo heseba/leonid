@@ -72,7 +72,7 @@ class ExperimentRunner:
         for r in range(len(self.domains)):
             experiments_ordered += list(combinations(self.domains, r + 1))
         experiments_ordered.sort(key=lambda experiment: sum(
-            self.target_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
+            self.all_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
 
         for experiment in experiments_ordered:
             for target_metric in self.target_metrics:
