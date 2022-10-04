@@ -23,7 +23,7 @@ experiments_path = Path('experiments_cnn.csv')
 metrics_path = Path('combined.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022Ecommerce', 'AVI', 'CHI', 'english', 'foreign', 'grayscale', 'IJHCS', 'practice', 'webby']
+domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022ECommerce', 'AVI', 'CHI', 'english', 'foreign', 'grayscale', 'IJHCS', 'practice', 'webby']
 #domains = ['AM2022Banks']
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/dataverse_files'

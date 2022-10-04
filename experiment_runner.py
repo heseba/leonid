@@ -1,5 +1,8 @@
 import csv
+import pickle
 from itertools import combinations
+from pathlib import Path
+
 import pandas as pd
 
 class ExperimentRunner:
@@ -10,6 +13,7 @@ class ExperimentRunner:
         self.all_metrics = all_metrics
         self.target_metrics = target_metrics
         self.domains = domains
+        self.experiments_order = 'experiments_order.pkl'
 
 
 
@@ -23,7 +27,7 @@ class ExperimentRunner:
         food = int('food' in experiment)
         culture = int('culture' in experiment)
         am2022banks = int('AM2022Banks' in experiment)
-        am2022ecommerce = int('AM2022Ecommerce' in experiment)
+        am2022ecommerce = int('AM2022ECommerce' in experiment)
         avi = int('avi' in experiment)
         chi = int('chi' in experiment)
         english = int('english' in experiment)
@@ -69,10 +73,16 @@ class ExperimentRunner:
 
     def run_experiments(self, screenshots_directory=None):
         experiments_ordered = []
-        for r in range(len(self.domains)):
-            experiments_ordered += list(combinations(self.domains, r + 1))
-        experiments_ordered.sort(key=lambda experiment: sum(
-            self.all_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
+        if Path(self.experiments_order).exists() and Path(self.experiments_order).is_file():
+            print('Found existing experiments order, loading...')
+            with open(self.experiments_order, 'rb') as f:
+                experiments_ordered = pickle.load(f)
+        else:
+            print('Ordering experiments by dataset sizes')
+            for r in range(len(self.domains)):
+                experiments_ordered += list(combinations(self.domains, r + 1))
+            experiments_ordered.sort(key=lambda experiment: sum(
+                self.all_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
 
         for experiment in experiments_ordered:
             for target_metric in self.target_metrics:

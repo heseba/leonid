@@ -54,7 +54,7 @@ class CNN:
 
     def load_data(self, data_dir):
         if self.all_metrics is None:
-            self.all_metrics = pd.read_csv("integer.csv", delimiter=',')
+            self.all_metrics = pd.read_csv("combined.csv", delimiter=',')
 
         screenshots_of_domain = self.all_metrics[self.all_metrics.domain.isin(self.domains)]
         available_screenshots = [(p.name, p) for p in Path(data_dir).glob('*/*.png')]
@@ -151,6 +151,6 @@ class CNN:
 
 
 if __name__ == '__main__':
-    cnn = CNN('Aesthetics', domains=['food'])
-    model, history, n_train, n_val, times = cnn.train('/windows/Users/Sebastian/Downloads/leonid/images-food-debug')
+    cnn = CNN('Aesthetics', domains=['AM2022Banks'])
+    model, history, n_train, n_val, times = cnn.train('/home/sebastian/Downloads/DATASET_COMBINED')
     print(history.history)
