@@ -55,7 +55,7 @@ class ExperimentRunner:
             (experiments.culture == culture) &
             (experiments.am2022banks == am2022banks) &
             (experiments.am2022ecommerce == am2022ecommerce) &
-            (experiments.avi == avi) &
+            (experiments.avi_14 == avi) &
             (experiments.chi_15 == chi15) &
             (experiments.chi_20 == chi20) &
             (experiments.english == english) &
@@ -77,6 +77,8 @@ class ExperimentRunner:
                 experiments_ordered += list(combinations(self.domains, r + 1))
             experiments_ordered.sort(key=lambda experiment: sum(
                 self.all_metrics['domain'].value_counts()[domain] for domain in experiment), reverse=True)
+            with open(self.experiments_order, 'wb') as f:
+                pickle.dump(experiments_ordered, f)
 
         for experiment in experiments_ordered:
             for target_metric in self.target_metrics:
