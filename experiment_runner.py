@@ -32,12 +32,9 @@ class ExperimentRunner:
         chi = int('CHI' in experiment)
         english = int('english' in experiment)
         foreign = int('foreign' in experiment)
-        grayscale = int('grayscale' in experiment)
         ijhcs = int('IJHCS' in experiment)
-        practice = int('practice' in experiment)
-        webby = int('webby' in experiment)
         return news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
-            avi, chi, english, foreign, grayscale, ijhcs, practice, webby
+            avi, chi, english, foreign, ijhcs
 
 
     def experiment_already_ran(self, experiment, target_metric):
@@ -48,7 +45,7 @@ class ExperimentRunner:
         experiments = pd.read_csv(self.csv_path)
 
         news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
-            avi, chi, english, foreign, grayscale, ijhcs, practice, webby = self.encode_experiment(experiment)
+            avi, chi, english, foreign, ijhcs, = self.encode_experiment(experiment)
 
         matching_experiments = experiments.loc[
             (experiments.news == news) &
@@ -63,10 +60,7 @@ class ExperimentRunner:
             (experiments.chi == chi) &
             (experiments.english == english) &
             (experiments.foreign == foreign) &
-            (experiments.grayscale == grayscale) &
             (experiments.ijhcs == ijhcs) &
-            (experiments.practice == practice) &
-            (experiments.webby == webby) &
             (experiments.target_metric == target_metric)]
 
         return len(matching_experiments) > 0

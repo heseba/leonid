@@ -12,13 +12,13 @@ import pandas as pd
 import csv
 
 csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks', 'am2022ecommerce', 'avi', 'chi',
-                  'english', 'foreign', 'grayscale', 'ijhcs', 'practice', 'webby', 'target_metric', 'R2', 'mse', 'mae',
+                  'english', 'foreign', 'ijhcs', 'target_metric', 'R2', 'mse', 'mae',
                   'rmse', 'n_train', 'n_val', 'time', 'epochs', 'trials']
 csv_path = Path('experiments_ann.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
 domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022ECommerce', 'AVI', 'CHI',
-           'english', 'foreign', 'grayscale', 'IJHCS', 'practice', 'webby']
+           'english', 'foreign', 'IJHCS']
 
 screenshots_directory = 'images2'
 
@@ -31,7 +31,7 @@ def train(target_metric, domains, all_metrics, screenshots_directory=None):
 
 def record(experiment, target_metric, model, best_trial, n_train, n_val, times, epochs):
     csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks', 'am2022ecommerce', 'avi', 'chi',
-                  'english', 'foreign', 'grayscale', 'ijhcs', 'practice', 'webby', 'target_metric', 'R2', 'mse', 'mae',
+                  'english', 'foreign', 'ijhcs', 'target_metric', 'R2', 'mse', 'mae',
                   'rmse', 'n_train', 'n_val', 'time', 'epochs', 'trials']
 
     csv_exists = csv_path.exists() and csv_path.is_file()
@@ -42,8 +42,8 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times, 
         if not csv_exists:
             experiments_csv.writerow(csv_header)
 
-        news, health, gov, games, food, culture, am2022banks, am2022ecommerce, avi, chi, english, foreign, grayscale, \
-        ijhcs, practice, webby, = ExperimentRunner.encode_experiment(experiment)
+        news, health, gov, games, food, culture, am2022banks, am2022ecommerce, avi, chi, english, foreign, \
+        ijhcs, = ExperimentRunner.encode_experiment(experiment)
 
         r2 = best_trial.metrics.metrics['val_coeff_determination']._observations[0].value[0]
         mse = best_trial.metrics.metrics['val_mse']._observations[0].value[0]
@@ -54,7 +54,7 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times, 
 
         experiments_csv.writerow(
             [news, health, gov, games, food, culture, am2022banks, am2022ecommerce, avi, chi, english, foreign,
-             grayscale, ijhcs, practice, webby, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs, trials])
+             ijhcs, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs, trials])
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 

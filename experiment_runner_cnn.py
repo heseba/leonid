@@ -23,7 +23,7 @@ experiments_path = Path('experiments_cnn.csv')
 metrics_path = Path('combined.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022ECommerce', 'AVI', 'CHI', 'english', 'foreign', 'grayscale', 'IJHCS', 'practice', 'webby']
+domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022ECommerce', 'AVI', 'CHI', 'english', 'foreign', 'IJHCS']
 #domains = ['AM2022Banks']
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/leonid/images2'
 #screenshots_directory = '/windows/Users/Sebastian/Downloads/dataverse_files'
@@ -59,7 +59,7 @@ def train(target_metric, domains, all_metrics, screenshots_directory):
 
 def record(experiment, target_metric, model, history, n_train, n_val, times):
     csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks', 'am2022ecommerce', 'avi', 'chi',
-                  'english', 'foreign', 'grayscale', 'ijhcs', 'practice', 'webby', 'target_metric', 'R2', 'mse', 'mae',
+                  'english', 'foreign', 'ijhcs', 'target_metric', 'R2', 'mse', 'mae',
                   'rmse', 'n_train', 'n_val', 'time', 'epochs']
 
     csv_exists = experiments_path.exists() and experiments_path.is_file()
@@ -71,7 +71,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
             experiments_csv.writerow(csv_header)
 
         news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
-        avi, chi, english, foreign, grayscale, ijhcs, practice, webby = ExperimentRunner.encode_experiment(experiment)
+        avi, chi, english, foreign, ijhcs, = ExperimentRunner.encode_experiment(experiment)
         r2 = history.history['val_coeff_determination'][-1]
         mse = history.history['val_mse'][-1]
         mae = history.history['val_mae'][-1]
@@ -81,7 +81,7 @@ def record(experiment, target_metric, model, history, n_train, n_val, times):
 
         experiments_csv.writerow(
             [news, health, gov, games, food, culture, am2022banks, am2022ecommerce, avi, chi, english, foreign,
-             grayscale, ijhcs, practice, webby, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
+              ijhcs, target_metric, r2, mse, mae, rmse, n_train, n_val, time, epochs])
 
     # model.save(Path('models', f'{target_metric}-{"-".join(str(experiment))}'))
 
