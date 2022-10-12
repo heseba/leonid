@@ -16,8 +16,6 @@ class ExperimentRunner:
         self.experiments_order = 'experiments_order.pkl'
 
 
-
-
     @staticmethod
     def encode_experiment(experiment):
         news = int('news' in experiment)
@@ -28,13 +26,14 @@ class ExperimentRunner:
         culture = int('culture' in experiment)
         am2022banks = int('AM2022Banks' in experiment)
         am2022ecommerce = int('AM2022ECommerce' in experiment)
-        avi = int('AVI' in experiment)
-        chi = int('CHI' in experiment)
+        avi = int('AVI_14' in experiment)
+        chi15 = int('CHI_15' in experiment)
+        chi20 = int('CHI_20' in experiment)
         english = int('english' in experiment)
         foreign = int('foreign' in experiment)
         ijhcs = int('IJHCS' in experiment)
         return news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
-            avi, chi, english, foreign, ijhcs
+            avi, chi15, chi20, english, foreign, ijhcs
 
 
     def experiment_already_ran(self, experiment, target_metric):
@@ -45,7 +44,7 @@ class ExperimentRunner:
         experiments = pd.read_csv(self.csv_path)
 
         news, health, gov, games, food, culture, am2022banks, am2022ecommerce, \
-            avi, chi, english, foreign, ijhcs, = self.encode_experiment(experiment)
+            avi, chi15, chi20, english, foreign, ijhcs, = self.encode_experiment(experiment)
 
         matching_experiments = experiments.loc[
             (experiments.news == news) &
@@ -57,7 +56,8 @@ class ExperimentRunner:
             (experiments.am2022banks == am2022banks) &
             (experiments.am2022ecommerce == am2022ecommerce) &
             (experiments.avi == avi) &
-            (experiments.chi == chi) &
+            (experiments.chi_15 == chi15) &
+            (experiments.chi_20 == chi20) &
             (experiments.english == english) &
             (experiments.foreign == foreign) &
             (experiments.ijhcs == ijhcs) &
