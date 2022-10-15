@@ -45,10 +45,10 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times, 
         news, health, gov, games, food, culture, am2022banks, am2022ecommerce, avi, chi15, chi20, english, foreign, \
         ijhcs, = ExperimentRunner.encode_experiment(experiment)
 
-        r2 = best_trial.metrics.metrics['val_coeff_determination']._observations[0].value[0]
-        mse = best_trial.metrics.metrics['val_mse']._observations[0].value[0]
-        mae = best_trial.metrics.metrics['val_mae']._observations[0].value[0]
-        rmse = best_trial.metrics.metrics['val_root_mean_squared_error']._observations[0].value[0]
+        r2 = list(best_trial.metrics.metrics['val_coeff_determination']._observations.values())[0].value[0]
+        mse = list(best_trial.metrics.metrics['val_mse']._observations.values())[0].value[0]
+        mae = list(best_trial.metrics.metrics['val_mae']._observations.values())[0].value[0]
+        rmse = list(best_trial.metrics.metrics['val_root_mean_squared_error']._observations.values())[0].value[0]
         time = sum(times)
         trials = len(times)
 

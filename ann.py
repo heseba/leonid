@@ -70,7 +70,7 @@ class ANN:
             overwrite=True
         )
 
-        tuner.search_space_summary()
+        #tuner.search_space_summary()
 
         tuner.search(x_train, y_train,
                      epochs=100,
@@ -82,9 +82,9 @@ class ANN:
                                                               verbose=0,
                                                               mode='auto')])
 
-        tuner.results_summary()
+        #tuner.results_summary()
 
-        print(tuner.oracle.get_best_trials()[0].trial_id)
+        #print(tuner.oracle.get_best_trials()[0].trial_id)
 
         models = tuner.get_best_models(num_models=1)
 
@@ -97,12 +97,6 @@ class ANN:
         best_trial = tuner.oracle.trials[tuner.oracle.get_best_trials()[0].trial_id]
 
         return model, best_trial, len(x_train), len(x_test), tuner.times, tuner.epochs
-
-        # for i in range(1,100):
-        #     res = model.predict(np.expand_dims(x_test.iloc[[i]], axis=0))
-        #     print(x_test.iloc[[i]])
-        #     print(res)
-        #     print(np.argmax(res))
 
 
 if __name__ == '__main__':
