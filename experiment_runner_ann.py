@@ -17,8 +17,7 @@ csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks'
 csv_path = Path('experiments_ann42.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
-domains = ['news', 'health', 'gov', 'games', 'food', 'culture', 'AM2022Banks', 'AM2022ECommerce', 'AVI_14', 'CHI_15',
-           'CHI_20', 'english', 'foreign', 'IJHCS']
+domains = ['AM2022Banks', 'AM2022ECommerce', 'AVI_14', 'CHI_15', 'CHI_20', 'english', 'foreign', 'IJHCS']
 
 screenshots_directory = 'images2'
 
