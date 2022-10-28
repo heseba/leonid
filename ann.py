@@ -24,13 +24,13 @@ class ANN:
     def load_data(self, path):
         data = pd.read_csv(path, delimiter=',')
         data_of_domain = data[data.domain.isin(self.domains)]
-        filtered_data_of_domain = data_of_domain.loc[:, 'VA_PNG':'grid quality']
+        filtered_data_of_domain = data_of_domain.loc[:, 'VA_PNG':'pixel symmetry']
         filtered_data_of_domain = filtered_data_of_domain.join(data_of_domain.loc[:, self.target_metric])
         filtered_data_of_domain = filtered_data_of_domain.dropna()
 
         y = filtered_data_of_domain.loc[:, self.target_metric]
         print(y)
-        x = filtered_data_of_domain.loc[:, 'VA_PNG':'grid quality']
+        x = filtered_data_of_domain.loc[:, 'VA_PNG':'pixel symmetry']
         print(x)
         x = self.maximum_absolute_scaling(x)
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
@@ -58,7 +58,7 @@ class ANN:
         return model
 
     def train(self):
-        x_train, y_train, x_test, y_test = self.load_data("combined.csv")
+        x_train, y_train, x_test, y_test = self.load_data("ANN42-Input.csv")
 
         print(x_train, y_train, x_test, y_test)
 
