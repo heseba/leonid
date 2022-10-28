@@ -20,7 +20,7 @@ target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
 domains = ['AM2022Banks', 'AM2022ECommerce', 'AVI_14', 'CHI_15', 'CHI_20', 'english', 'foreign', 'IJHCS']
 
 screenshots_directory = 'images2'
-
+metrics_path = Path('ANN42-Input.csv')
 
 def train(target_metric, domains, all_metrics, screenshots_directory=None):
     ann = ANN(target_metric, domains=domains)
@@ -59,5 +59,6 @@ def record(experiment, target_metric, model, best_trial, n_train, n_val, times, 
 
 
 if __name__ == '__main__':
-    runner = ExperimentRunner(csv_path, train, record, target_metrics, domains)
+    all_metrics = pd.read_csv(metrics_path, delimiter=',')
+    runner = ExperimentRunner(csv_path, train, record, target_metrics, domains, all_metrics=all_metrics)
     runner.run_experiments()
