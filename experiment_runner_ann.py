@@ -14,7 +14,7 @@ import csv
 csv_header = ['news', 'health', 'gov', 'games', 'food', 'culture', 'am2022banks', 'am2022ecommerce', 'avi_14', 'chi_15',
                   'chi_20', 'english', 'foreign', 'ijhcs', 'target_metric', 'R2', 'mse', 'mae',
                   'rmse', 'n_train', 'n_val', 'time', 'epochs', 'trials']
-csv_path = Path('experiments_ann42.csv')
+csv_path = Path('experiments_ann32-8new.csv')
 
 target_metrics = ['Complexity', 'Aesthetics', 'Orderliness']
 domains = ['AM2022Banks', 'AM2022ECommerce', 'AVI_14', 'CHI_15', 'CHI_20', 'english', 'foreign', 'IJHCS']
